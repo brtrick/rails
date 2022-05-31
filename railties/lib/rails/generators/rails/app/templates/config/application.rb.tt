@@ -9,10 +9,13 @@ require "active_model/railtie"
 <%= comment_if :skip_active_job %>require "active_job/railtie"
 <%= comment_if :skip_active_record %>require "active_record/railtie"
 <%= comment_if :skip_active_storage %>require "active_storage/engine"
+<% say_if_dependency_issue :active_storage, :active_record, "Skipping active_storage in config/application.rb because active_record is skipped." %>
 require "action_controller/railtie"
 <%= comment_if :skip_action_mailer %>require "action_mailer/railtie"
 <%= comment_if :skip_action_mailbox %>require "action_mailbox/engine"
+<% say_if_dependency_issue :action_mailbox, :active_storage, "Skipping action_mailbox in config/application.rb because active_storage is skipped." %>
 <%= comment_if :skip_action_text %>require "action_text/engine"
+<% say_if_dependency_issue :action_text, :active_storage, "Skipping action_text in config/application.rb because active_storage is skipped." %>
 require "action_view/railtie"
 <%= comment_if :skip_action_cable %>require "action_cable/engine"
 <%= comment_if :skip_test %>require "rails/test_unit/railtie"

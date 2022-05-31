@@ -234,6 +234,20 @@ module Rails
         options[:skip_action_text] || skip_active_storage?
       end
 
+      def say_if_dependency_issue(main, dependency, message) # :doc:
+        question = "skip_#{dependency}?"
+
+        dependency_issue = !options["skip_#{main}"] && (
+          if respond_to?(question, true)
+            send(question)
+          else
+            options["skip_#{dependency}"]
+          end
+        )
+
+        say message, :red if dependency_issue
+      end
+
       def skip_dev_gems? # :doc:
         options[:skip_dev_gems]
       end
@@ -330,7 +344,11 @@ module Rails
       end
 
       def hotwire_gemfile_entry
-        return if options[:skip_javascript] || options[:skip_hotwire]
+        return if options[:skip_hotwire]
+        if options[:skip_javascript]
+          say "Skipping hotwire gems in Gemfile because javascript was skipped.", :red
+          return
+        end
 
         turbo_rails_entry =
           GemfileEntry.floats "turbo-rails", "Hotwire's SPA-like page accelerator [https://turbo.hotwired.dev]"
@@ -454,7 +472,11 @@ module Rails
       end
 
       def run_hotwire
-        return if options[:skip_javascript] || options[:skip_hotwire] || !bundle_install?
+        return if options[:skip_hotwire] || !bundle_install?
+        if options[:skip_javascript]
+          say "Skipping hotwire installation because javascript was skipped.", :red
+          return
+        end
 
         rails_command "turbo:install stimulus:install"
       end

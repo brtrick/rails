@@ -111,6 +111,7 @@ module Rails
         directory "initializers"
         directory "locales" unless options[:updating]
       end
+      say_if_dependency_issue :active_storage, :active_record, "Skipping config/storage.yml because active_record is skipped." unless options[:updating]
     end
 
     def config_when_updating
@@ -133,6 +134,8 @@ module Rails
 
       if !skip_active_storage? && !active_storage_config_exist
         template "config/storage.yml"
+      elsif !active_storage_config_exist
+        say_if_dependency_issue :active_storage, :active_record, "Skipping config/storage.yml because active_record is skipped."
       end
 
       if skip_sprockets? && skip_propshaft? && !assets_config_exist
@@ -333,8 +336,10 @@ module Rails
       remove_task :update_bin_files
 
       def update_active_storage
-        unless skip_active_storage?
+        if !skip_active_storage?
           rails_command "active_storage:update", inline: true
+        else
+          say_if_dependency_issue :active_storage, :active_record, "Skipping active_storage update because active_record is skipped."
         end
       end
       remove_task :update_active_storage
@@ -405,7 +410,11 @@ module Rails
       end
 
       def create_storage_files
-        build(:storage) unless skip_active_storage?
+        if !skip_active_storage?
+          build(:storage)
+        else
+          say_if_dependency_issue :active_storage, :active_record, "Skipping storage build because active_record is skipped."
+        end
       end
 
       def delete_app_assets_if_api_option

@@ -34,10 +34,12 @@ Rails.application.configure do
 
     config.cache_store = :null_store
   end
-  <%- unless skip_active_storage? -%>
+  <%- if !skip_active_storage? -%>
 
   # Store uploaded files on the local file system (see config/storage.yml for options).
   config.active_storage.service = :local
+  <% else -%>
+  <% say_if_dependency_issue :active_storage, :active_record, "Skipping active_storage config in config/environments/development.rb because active_record is skipped." -%>
   <%- end -%>
   <%- unless options.skip_action_mailer? -%>
 

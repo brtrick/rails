@@ -27,10 +27,12 @@ gem "bootsnap", require: false
 # Use Sass to process CSS
 # gem "sassc-rails"
 <% end -%>
-<% unless skip_active_storage? -%>
+<% if !skip_active_storage? -%>
 
 # Use Active Storage variants [https://guides.rubyonrails.org/active_storage_overview.html#transforming-images]
 # gem "image_processing", "~> 1.2"
+<% else -%>
+<% say_if_dependency_issue :active_storage, :active_record, "Skipping active_storage image processing gem because active_record is skipped." -%>
 <% end -%>
 <%- if options.api? -%>
 
